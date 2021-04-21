@@ -39,7 +39,9 @@ Ich habe hier nochmals die wichtigsten Tastaturkürzel für dich hinzugefügt
 
 # Übungen - Teil 1 - Projektarbeit
 
-Im Anschluss an die sieben Kurseinheiten bekommt ihr die Gelegenheit als Teil eines kleinen Abschlussprojektes meine Unterstützung zu erhalten. Dafür braucht es ein paar Vorraussetzungen:
+Im Anschluss an die sieben Kurseinheiten bekommt ihr die Gelegenheit als Teil eines kleinen Abschlussprojektes Unterstützung zu erhalten. 
+
+Dafür braucht es ein paar Vorraussetzungen:
 
 1. R, RStudio und Git sind auf euren Arbeitsgeräten installiert
 2. Daten für die Projektarbeit sind ausgewählt
@@ -67,12 +69,63 @@ Ideale Daten für das Projekt gibt es nicht, jedoch ist es sinnvoll nicht unbedi
 
 Wie das geht hast du in [Übung 1 der Hausaufgabe aus Woche 5](https://rstatszh.github.io/website/ha-05-erstes-projekt.html#%C3%BCbung-1---erstelle-ein-eigenes-git-repository) gelernt. Falls du Schwierigkeiten hast meiner Anleitung zu folgen, melde dich umgehend und ich kann dich unterstützen. 
 
-Abweichend von der Anleitung ist folgendes:
+Abweichend von der Anleitung ist Folgendes:
 
+- 1. + 2. Schritt: Diese Schritte kannst du überspringen und das neue Repository unter deinem Benutzernamen erstellen. Beginne also mit dem 3. Schritt und erstelle ein neues Repository in deinem persönlichen Benutzer Account.
 - 4. Schritt: Überlege dir hier einen eigenen, sinnvollen Namen für das Repository
 - 6. Schritt: Entscheide hier selbst darüber ob du das Repository öffentlich (public) oder geschlossen (private) zugänglich machen möchtest. 
 
-Im 4. Schritt solltest du dir nu
+Auch wird dieses Mal kein Project in der RStudio Cloud erstellt, sondern auf deinem eigenen Arbeitsgerät. Überspringe deshalb die Schritte 12 bis 17 und ersetze diese durch Folgendes:
+
+- Öffne RStudio auf deinem Arbeitsgerät
+- Klicke auf File > New Project. Ein neues Fenster öffnet sich.
+
+```{r}
+
+```
+
+- Klicke auf "Version Control", dann klicke auf "Git"
+
+```{r}
+
+```
+
+- Füge die URL aus deiner Zwischenablage im Feld "Repository URL" ein. Im Feld "Project directory name:" wird der Name des Repositories übernommen. 
+
+```{r}
+
+```
+
+- Wähle über den Button "Browse..." den Ordner auf deinem Arbeitsgerät aus, in dem du das Repository speichern möchtest (**Tipp:** Ich empfehle einen Ordner names "gitrepos" zu erstellen, welcher sich so nah wie möglich am Stammpfad des Laufwerks (Lokaler Datenträger) auf deinem Arbeitsgerät befindet. Im Windows Betriebssystem ist dies üblicherweise "C:". As bietet sich an, an dem Ort 'C:\gitrepos' nur Ordner anzulegen, welche auch ein Git Repository sind. Dies erlaubt eine saubere Trennung zwischen allgemeinen Ordnern auf deinem Arbeitsgerät und solchen die ein Git Repository sind. 
+
+```{r}
+
+```
+
+- Klicke auf "Create Project", was für dich die folgenden drei Dinge erstellt
+    - ein Ordner auf deinem Arbeitsgerät
+    - ein lokales Git Repository welches mit einem remote GitHub Repository verbunden ist
+    - ein RStudio Project
+
+```{r}
+
+```
+
+- Betrachte dein offenes RStudio Project
+- Folge nun noch den Schritten 38 bis 43 aus der Hausaufgabe 5.
+
+Als nächstes könntest du mittels eines Dateimanagers (z.B. Windows File Explorer) deine Daten für das Projekt in dieses Repository kopieren. Es empfiehlt sich dazu innerhalb des Repositories einen Ordner namens "data" zu erstellen und die Daten dort abzulegen.
+    
+Wie du nun weiter machst ist dir überlassen. Möchtest du nicht, dass die Daten welche lokal gespeichert sind auf GitHub auftauchen? Dann füge den Pfad an dem diese liegen zu deiner `.gitignore` Datei hinzu (siehe Screenshot und ersetze den Namen data ggf. durch den Namen den du für diesen Ordner gewählt hast. 
+
+```{r}
+
+```
+
+
+Auch ist es nützlich eine README.md Datei zu erstellen in diese im Stammpfad des Repositories zu speichern. In der README kannst du dein Projekt beschreiben oder wichtige Vorraussetzungen für die Nutzung und Wiederverwendbarkeit deklarieren (Lizenzen). 
+
+Sobald du zufrieden bist mit dem Aufbau deines Projektordners kannst du deine Veränderung mittels dem Git Reiter oben rechts in RStudio zurück auf GitHub pushen. 
 
 # Übungen - Teil 2 - Treibhausgase 
 
