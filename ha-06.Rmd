@@ -18,7 +18,11 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```{r lade-packages, message=FALSE}
 
 # Ich habe die Packages bereits für dich geladen
-
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
 
 ```
 
@@ -32,5 +36,307 @@ Ich habe hier nochmals die wichtigsten Tastaturkürzel für dich hinzugefügt
 - **Die Pipe (%>%):** Ctrl + Shift + M
 - **Der Zuweisungs-Operator (<-)**: Alt + -
 
-# Übungen 
 
+# Übungen - Teil 1 - Treibhausgase 
+
+## Übung 1 - Daten importieren
+
+1. Importiere Die CSV Ressource aus dem folgendenden Metadateneintrag in deine Arbeitsumgebung: https://opendata.swiss/de/dataset/treibhausgasemissionen-stadt-zurich-ohne-klimakorrektur-1990-20163
+
+Dir sind zwei Wege bekannt um dies zu erreichen. Schau bei Bedarf im Praktikum 8 oder im Praktikum 9 nach. Den Namen für das Objekt in deiner Arbeitsumgebung (Environment) kannst du selbst auswählen.
+
+2. Strick das Dokument und dann: git add, commit, push alle Veränderung zurück auf GitHub
+
+```{r}
+ghg <- read_csv("https://data.stadt-zuerich.ch/dataset/ugz_treibhausgasbilanz/download/ugz_treibhausgasbilanz.csv")
+```
+
+## Übung 2 - Daten transformieren und visualisieren
+
+### 2.1 Pivoting
+
+Die Daten sind derzeit in einem weiten Format. Das Ziel ist die Daten in ein langes Format zu bringen wobei nur die Spalte Jahr beibehalten wird und alle Spalten von Strom bis Heizoel_EL gedreht werden. Ich habe dir hier bereits etwas Code mit Lücken als Hilfestellung vorbereitet.
+
+1. Erstelle ein neues Objekt in deiner Arbeitsumgebung (Environment), welches im langen Format ist in dem du die Lücken ausfüllst. Den Namen für das Objekt kannst du selbst auswählen.
+
+```{r, eval=FALSE}
+
+___ <- ___ %>% 
+   ____longer(
+      
+     # In diesem Argument werden die Spalten ausgewählt welche gedreht werden
+      ___ = !Jahr,            
+      
+      # In diesem Argument wird der Name für die neue Spalte definiert, welche
+      # die Namen aus den zuvor ausgewählten Spalten enthält
+      ___ = "Energietraeger", 
+      
+      # In diesem Argument wird der Name für die neue Spalte definiert, welche
+      # die Werte aus den zuvor ausgewählten Spalten enhält
+      ___ = "Emissionen"
+   )
+  
+```
+
+
+```{r}
+ghg_long <- ghg %>% 
+  pivot_longer(cols = !Jahr,
+               names_to = "Energietraeger",
+               values_to = "Emissionen")
+```
+
+### 2.2 Daten zusammenfassen und neue Variable erstellen
+
+1. Wieviele Spalten und Reihen hat das neue Objekt welches du im Schritt zuvor erstellt hast? **Beachte: Falls dies nicht 3 Spalten und 216 Reihen sind, gehe nochmals zur vorherigen Übung und überprüfe deinen Code**
+
+2. Starte mit dem neu erstellten Objekt im langen Format, und erstelle eine Code Sequenz, in welcher:
+
+- die Funktionen `group_by()` und `summarise()` um die Summe der Emmissionen pro Jahr zu berechnen
+- die Funktionen `mutate()` und `lag()` die Differenz zwischen den Jahren berechnen
+
+3. Speicher das Ergebnis als ein neues Objekt in deiner Arbeitsumgebung (Environment) mit einem Namen deiner Wahl
+
+```{r}
+
+ghg_long_sum <- ghg_long %>% 
+  group_by(Jahr) %>% 
+  summarise(
+    Summe = sum(Emissionen)
+  ) %>% 
+  mutate(Differenz = Summe - lag(Summe))
+
+```
+
+## 2.3 Daten visualisieren 1
+
+1. Starte mit dem Objekt, welches du in Schritt 3 der vorheringen Übung erstellt hast
+2. Erstelle ein Säulendiagram und lege das Jahr auf die x-Achse und die Differenz der Emissionen zwischen den Jahren auf die y-Achse
+3. **Bonus:** Warum ist auf der x-Achse immer nur für alle zehn Jahre ein Tick mit Beschriftung?  
+4. **Bonus:** Wandle den Typen der Variable "Jahr" in einen Faktor um bevor du den Plot erstellst
+5. **Bonus:** Passe das Layout des Plots beliebig an
+
+```{r}
+
+ghg_long_sum %>% 
+  mutate(Jahr = as_factor(Jahr)) %>% 
+  ggplot(aes(x = Jahr, y = Differenz)) +
+  geom_col()
+```
+
+
+## 2.4 Daten visualisieren 2 (Bonus)
+
+1. Nutze das Objekt welches du in "2.1 Pivoting" erstellt hast, und:
+
+- Nutze die Funktion `group_by()` um die Daten nach dem Jahr zu gruppieren
+- Nutze die Funktion `filter()` um in der Spalte Jahr nur das Jahr 1990 und das Jahr 2016 anzuzeigen
+  - Wieviele Wege fallen dir ein um auf das Ergebnis zu kommen?
+
+2. Speicher das Ergebnis als ein neues Objekt in deiner Arbeitsumgebung (Environment) mit einem Namen deiner Wahl
+```{r}
+
+ghg_long %>% 
+  filter(Jahr %in% c(2016, 1990))  
+  filter(Jahr == 2016 | Jahr == 1990)
+  filter(Jahr == max(Jahr) | Jahr == min(Jahr))
+
+```
+
+
+```{r treibhausgas-tab2, fig.show="hide", echo=TRUE}
+
+ghg_tidy <- ghg %>% 
+   pivot_longer(
+      cols = Strom:Heizoel_EL,     # Variablen von Strom bis Heizoel_EL
+      names_to = "Energietraeger", # Variablen Namen -> Neue Spalte Energietraeger
+      values_to = "Emissionen"     # Variablen Werte -> Neue Spalte Emissionen
+   ) %>% 
+   group_by(Jahr) %>%   #<< 
+   mutate(Prozent = Emissionen / sum(Emissionen) * 100) %>%  #<<
+   ungroup() %>% #<<
+   filter(Jahr == max(Jahr) | Jahr == min(Jahr)) #<< 
+
+```
+
+```{r ref.label="treibhausgas1-tab2"}
+ghg_tidy %>% 
+   arrange(Energietraeger)
+```
+
+```{r treibhausgas3, fig.show="hide", echo=TRUE}
+
+ggplot(data = ghg_tidy,                            # Daten im neuen Format
+       mapping = aes(x = Jahr,                     # Nur 1990 und 2016
+                     y = Prozent,                  # Neue Variable Prozent
+                     color = Energietraeger))  +   # Energieträger als Farben
+   
+   geom_line(size = 1) + #<<
+   geom_point(size = 5) + #<<
+   
+   # Plot Styling ab hier  
+   labs(title = "Treibhausgasbilanz 1990 und 2016",
+        y = "Treibhausgasemissionen [Prozent]",
+        x = NULL,
+        caption = "Daten: https://data.stadt-zuerich.ch/dataset/ugz_treibhausgasbilanz",
+        fill = "Energieträger") +
+   scale_x_continuous(limits = c(1990, 2016), 
+                      breaks = c(1990, 2016)) +
+   scale_color_brewer(type = "qual") +
+   theme_minimal() +
+   theme(panel.grid.minor = element_blank())
+```
+
+
+
+1. Starte mit dem neu erstellen Objekt, welches sich nun in einem langen Format sein sollte. 
+2. Nutze die Funktion `group_by()` um die Daten nach der Variable "Jahr" zu gruppieren.
+3. Nutze die Funktion `mutate()` um eine neue Variable mit dem Namen "Prozent" zu erstellen. Die Variable soll den prozentualen Anteil der Emissionen der einzelnen Energieträger für jedes Jahr darstellen. **Tipp: Prozent = x / sum(x) * 100**
+
+```{r}
+
+
+
+
+```
+
+
+
+
+# Warum Tidy data? Warum pivoting?
+
+.panelset[
+
+.panel[.panel-name[Code]
+```{r treibhausgas-tab1, fig.show="hide", echo=TRUE}
+
+ghg_tidy <- ghg %>% 
+   pivot_longer(
+      cols = Strom:Heizoel_EL,     # Variablen von Strom bis Heizoel_EL
+      names_to = "Energietraeger", # Variablen Namen -> Neue Spalte Energietraeger
+      values_to = "Emissionen"     # Variablen Werte -> Neue Spalte Emissionen
+   ) %>% 
+   group_by(Jahr) %>% #<<
+   mutate(Prozent = Emissionen / sum(Emissionen) * 100) #<<
+```
+]
+
+.panel[.panel-name[Data]
+```{r ref.label="treibhausgas1-tab1"}
+
+ghg_tidy
+
+```
+]
+]
+
+---
+.panelset[
+
+.panel[.panel-name[Code]
+```{r treibhausgas2, fig.show="hide", echo=TRUE}
+
+ggplot(data = ghg_tidy,                            # Daten im neuen Format
+       mapping = aes(x = Jahr,                     # Bestehende Variable Jahr
+                     y = Prozent,                  # Neue Variable Prozent
+                     fill = Energietraeger))  +    # Energieträger als Farben
+   geom_area() +                                   # Neues Geom
+   
+   # Plot Styling ab hier 
+   scale_fill_brewer(type = "qual", palette = 1) +
+   scale_x_continuous(breaks = seq(1990, 2016, 1), 
+                      expand = c(0, 0),
+                      limits = c(1990, 2016)) +
+   scale_y_continuous(expand = c(0, 0)) +
+   labs(title = "Treibhausgasbilanz 1990 bis 2016",
+        y = "Treibhausgasemissionen [Prozent]",
+        x = NULL,
+        caption = "Daten: https://data.stadt-zuerich.ch/dataset/ugz_treibhausgasbilanz",
+        fill = "Energieträger") +
+   theme_minimal()   +
+   theme(panel.grid = element_blank(),
+         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 10))
+```
+]
+
+.panel[.panel-name[Plot]
+```{r ref.label="treibhausgas1", echo=FALSE, warning=FALSE, out.width="100%", fig.width=11}
+
+
+```
+]
+]
+
+---
+# Warum Tidy data? Warum pivoting?
+
+```{r}
+
+
+```
+
+
+
+.panelset[
+
+.panel[.panel-name[Code]
+```{r treibhausgas-tab2, fig.show="hide", echo=TRUE}
+
+ghg_tidy <- ghg %>% 
+   pivot_longer(
+      cols = Strom:Heizoel_EL,     # Variablen von Strom bis Heizoel_EL
+      names_to = "Energietraeger", # Variablen Namen -> Neue Spalte Energietraeger
+      values_to = "Emissionen"     # Variablen Werte -> Neue Spalte Emissionen
+   ) %>% 
+   group_by(Jahr) %>%   #<< 
+   mutate(Prozent = Emissionen / sum(Emissionen) * 100) %>%  #<<
+   ungroup() %>% #<<
+   filter(Jahr == max(Jahr) | Jahr == min(Jahr)) #<< 
+
+```
+]
+
+.panel[.panel-name[Data]
+```{r ref.label="treibhausgas1-tab2"}
+ghg_tidy %>% 
+   arrange(Energietraeger)
+```
+]
+]
+
+
+---
+.panelset[
+
+.panel[.panel-name[Code]
+```{r treibhausgas3, fig.show="hide", echo=TRUE}
+
+ggplot(data = ghg_tidy,                            # Daten im neuen Format
+       mapping = aes(x = Jahr,                     # Nur 1990 und 2016
+                     y = Prozent,                  # Neue Variable Prozent
+                     color = Energietraeger))  +   # Energieträger als Farben
+   
+   geom_line(size = 1) + #<<
+   geom_point(size = 5) + #<<
+   
+   # Plot Styling ab hier  
+   labs(title = "Treibhausgasbilanz 1990 und 2016",
+        y = "Treibhausgasemissionen [Prozent]",
+        x = NULL,
+        caption = "Daten: https://data.stadt-zuerich.ch/dataset/ugz_treibhausgasbilanz",
+        fill = "Energieträger") +
+   scale_x_continuous(limits = c(1990, 2016), 
+                      breaks = c(1990, 2016)) +
+   scale_color_brewer(type = "qual") +
+   theme_minimal() +
+   theme(panel.grid.minor = element_blank())
+```
+]
+
+.panel[.panel-name[Plot]
+```{r ref.label="treibhausgas3", echo=FALSE, warning=FALSE}
+
+
+```
+]
+]
