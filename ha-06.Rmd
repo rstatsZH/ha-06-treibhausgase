@@ -1,0 +1,36 @@
+---
+title: "Hausaufgabe 06 - Treibhausgase"
+author: "Füge deinen Namen hier hinzu"
+date: "Füge das Datum hier hinzu"
+output: 
+  html_document: 
+    toc: yes
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+# Ich habe hier ein paar Standardeinstellungen für dich vorgenommen
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Lade Packages
+
+```{r lade-packages, message=FALSE}
+
+# Ich habe die Packages bereits für dich geladen
+
+
+```
+
+# Tastaturkürzel
+
+Ich habe hier nochmals die wichtigsten Tastaturkürzel für dich hinzugefügt
+
+- **Einen neuen Code-chunk hinzufügen:** Ctrl + Alt + I
+- **Code "Zeile für Zeile" innerhalb eines Code-chunks ausführen:** Ctrl + Enter
+- **Den gesamten Code-chunk ausführen:** Ctrl + Shift + Enter
+- **Die Pipe (%>%):** Ctrl + Shift + M
+- **Der Zuweisungs-Operator (<-)**: Alt + -
+
+# Übungen 
+
