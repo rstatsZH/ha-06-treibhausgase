@@ -115,17 +115,20 @@ Auch wird dieses Mal kein Project in der RStudio Cloud erstellt, sondern auf dei
 - Folge nun noch den Schritten 38 bis 43 aus der Hausaufgabe 5.
 
 Als nächstes könntest du mittels eines Dateimanagers (z.B. Windows File Explorer) deine Daten für das Projekt in dieses Repository kopieren. Es empfiehlt sich dazu innerhalb des Repositories einen Ordner namens "data" zu erstellen und die Daten dort abzulegen.
-    
+
+```{r}
+
+```
+
 Wie du nun weiter machst ist dir überlassen. Möchtest du nicht, dass die Daten welche lokal gespeichert sind auf GitHub auftauchen? Dann füge den Pfad an dem diese liegen zu deiner `.gitignore` Datei hinzu (siehe Screenshot und ersetze den Namen data ggf. durch den Namen den du für diesen Ordner gewählt hast. 
 
 ```{r}
 
 ```
 
-
 Auch ist es nützlich eine README.md Datei zu erstellen in diese im Stammpfad des Repositories zu speichern. In der README kannst du dein Projekt beschreiben oder wichtige Vorraussetzungen für die Nutzung und Wiederverwendbarkeit deklarieren (Lizenzen). 
 
-Sobald du zufrieden bist mit dem Aufbau deines Projektordners kannst du deine Veränderung mittels dem Git Reiter oben rechts in RStudio zurück auf GitHub pushen. 
+Sobald du zufrieden bist mit dem Aufbau deines Projektordners kannst du deine Veränderung mittels den dir bekannten Schritten und unter dem Git Reiter oben rechts in RStudio zurück auf GitHub pushen. 
 
 # Übungen - Teil 2 - Treibhausgase 
 
@@ -324,142 +327,3 @@ ggplot(data = ghg_tidy,                            # Daten im neuen Format
 ```
 
 
-
-
-# Warum Tidy data? Warum pivoting?
-
-.panelset[
-
-.panel[.panel-name[Code]
-```{r treibhausgas-tab1, fig.show="hide", echo=TRUE}
-
-ghg_tidy <- ghg %>% 
-  pivot_longer(
-    cols = Strom:Heizoel_EL,     # Variablen von Strom bis Heizoel_EL
-    names_to = "Energietraeger", # Variablen Namen -> Neue Spalte Energietraeger
-    values_to = "Emissionen"     # Variablen Werte -> Neue Spalte Emissionen
-  ) %>% 
-  group_by(Jahr) %>% #<<
-  mutate(Prozent = Emissionen / sum(Emissionen) * 100) #<<
-```
-]
-
-.panel[.panel-name[Data]
-```{r ref.label="treibhausgas1-tab1"}
-
-ghg_tidy
-
-```
-]
-]
-
----
-.panelset[
-
-.panel[.panel-name[Code]
-```{r treibhausgas2, fig.show="hide", echo=TRUE}
-
-ggplot(data = ghg_tidy,                            # Daten im neuen Format
-       mapping = aes(x = Jahr,                     # Bestehende Variable Jahr
-                     y = Prozent,                  # Neue Variable Prozent
-                     fill = Energietraeger))  +    # Energieträger als Farben
-  geom_area() +                                   # Neues Geom
-  
-  # Plot Styling ab hier 
-  scale_fill_brewer(type = "qual", palette = 1) +
-  scale_x_continuous(breaks = seq(1990, 2016, 1), 
-                     expand = c(0, 0),
-                     limits = c(1990, 2016)) +
-  scale_y_continuous(expand = c(0, 0)) +
-  labs(title = "Treibhausgasbilanz 1990 bis 2016",
-       y = "Treibhausgasemissionen [Prozent]",
-       x = NULL,
-       caption = "Daten: https://data.stadt-zuerich.ch/dataset/ugz_treibhausgasbilanz",
-       fill = "Energieträger") +
-  theme_minimal()   +
-  theme(panel.grid = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 10))
-```
-]
-
-.panel[.panel-name[Plot]
-```{r ref.label="treibhausgas1", echo=FALSE, warning=FALSE, out.width="100%", fig.width=11}
-
-
-```
-]
-]
-
----
-# Warum Tidy data? Warum pivoting?
-
-```{r}
-
-
-```
-
-
-
-.panelset[
-
-.panel[.panel-name[Code]
-```{r treibhausgas-tab2, fig.show="hide", echo=TRUE}
-
-ghg_tidy <- ghg %>% 
-  pivot_longer(
-    cols = Strom:Heizoel_EL,     # Variablen von Strom bis Heizoel_EL
-    names_to = "Energietraeger", # Variablen Namen -> Neue Spalte Energietraeger
-    values_to = "Emissionen"     # Variablen Werte -> Neue Spalte Emissionen
-  ) %>% 
-  group_by(Jahr) %>%   #<< 
-  mutate(Prozent = Emissionen / sum(Emissionen) * 100) %>%  #<<
-  ungroup() %>% #<<
-  filter(Jahr == max(Jahr) | Jahr == min(Jahr)) #<< 
-
-```
-]
-
-.panel[.panel-name[Data]
-```{r ref.label="treibhausgas1-tab2"}
-ghg_tidy %>% 
-  arrange(Energietraeger)
-```
-]
-]
-
-
----
-.panelset[
-
-.panel[.panel-name[Code]
-```{r treibhausgas3, fig.show="hide", echo=TRUE}
-
-ggplot(data = ghg_tidy,                            # Daten im neuen Format
-       mapping = aes(x = Jahr,                     # Nur 1990 und 2016
-                     y = Prozent,                  # Neue Variable Prozent
-                     color = Energietraeger))  +   # Energieträger als Farben
-  
-  geom_line(size = 1) + #<<
-  geom_point(size = 5) + #<<
-  
-  # Plot Styling ab hier  
-  labs(title = "Treibhausgasbilanz 1990 und 2016",
-       y = "Treibhausgasemissionen [Prozent]",
-       x = NULL,
-       caption = "Daten: https://data.stadt-zuerich.ch/dataset/ugz_treibhausgasbilanz",
-       fill = "Energieträger") +
-  scale_x_continuous(limits = c(1990, 2016), 
-                     breaks = c(1990, 2016)) +
-  scale_color_brewer(type = "qual") +
-  theme_minimal() +
-  theme(panel.grid.minor = element_blank())
-```
-]
-
-.panel[.panel-name[Plot]
-```{r ref.label="treibhausgas3", echo=FALSE, warning=FALSE}
-
-
-```
-]
-]
