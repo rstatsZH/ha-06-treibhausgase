@@ -104,7 +104,7 @@ ___ <- ___ %>%
 ```
 
 
-## 2.3 Daten visualisieren 1
+### 2.3 Daten visualisieren 1
 
 1. Starte mit dem Objekt, welches du in Schritt 3 der vorheringen Übung erstellt hast
 2. Erstelle ein Säulendiagram und lege das Jahr auf die x-Achse und die Differenz der Emissionen zwischen den Jahren auf die y-Achse
@@ -117,7 +117,7 @@ ___ <- ___ %>%
 ```
 
 
-## 2.4 Daten visualisieren 2 (Bonus)
+### 2.4 Daten visualisieren 2 (Bonus)
 
 1. Nutze das Objekt welches du in "2.1 Pivoting" erstellt hast, und:
 
@@ -131,7 +131,7 @@ ___ <- ___ %>%
 
 ```
 
-3. Nutze das neue Objekt um folgendes verbundenes Säulendiagramm zu reproduzieren
+3. Nutze das neue Objekt um das Säulendiagram aus der Beschreibung der Hausaufgabe auf der Webseite für den Kurs zu reproduzieren
 
 ```{r}
 
