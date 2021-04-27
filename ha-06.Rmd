@@ -65,7 +65,9 @@ Die Daten im Objekt `ghg` sind derzeit in einem weiten Format. Das Ziel ist die 
 
 1. Erstelle ein neues Objekt in deiner Arbeitsumgebung (Environment), welches im langen Format ist. Fülle dazu die Lücken aus. Den Namen für das neue Objekt kannst du selbst auswählen.
 
-```{r, eval=FALSE}
+2. In den Code-chunk Optionen für den folgenden Code-chunk, ersetze FALSE durch TRUE (eval=TRUE)
+
+```{r pivot, eval=FALSE}
 
 ___ <- ___ %>% 
   ____longer(
