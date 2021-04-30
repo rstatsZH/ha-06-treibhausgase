@@ -1,0 +1,259 @@
+---
+title: "Hausaufgabe 06 - Treibhausgase"
+author: "Füge deinen Namen hier hinzu"
+date: "Füge das Datum hier hinzu"
+output: 
+  html_document: 
+    toc: yes
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+# Ich habe hier ein paar Standardeinstellungen für dich vorgenommen
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Packages laden
+
+```{r lade-packages2, message=FALSE}
+
+# Ich habe die Packages bereits für dich  geladen
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
+library(DBI)
+library(palmerpenguins)
+
+```
+
+# Tastaturkürzel
+
+Ich habe hier nochmals die wichtigsten Tastaturkürzel für dich hinzugefügt
+
+- **Einen neuen Code-chunk hinzufügen:** Ctrl + Alt + I
+- **Code "Zeile für Zeile" innerhalb eines Code-chunks ausführen:** Ctrl + Enter
+- **Den gesamten Code-chunk ausführen:** Ctrl + Shift + Enter
+- **Die Pipe (%>%):** Ctrl + Shift + M
+- **Der Zuweisungs-Operator (<-)**: Alt + -
+
+# Übungen - Teil 1 - Projektarbeit
+
+In diesem Teil der Hausaufgabe wird kein Code geschrieben.
+
+# Übungen - Teil 2 - Treibhausgase 
+
+## Übung 1 - Daten importieren
+
+1. Importiere Die CSV Ressource aus dem folgendenden Metadateneintrag in deine Arbeitsumgebung: https://opendata.swiss/de/dataset/treibhausgasemissionen-stadt-zurich-ohne-klimakorrektur-1990-20163
+
+Dir sind zwei Wege bekannt um dies zu erreichen. Schau bei Bedarf im Praktikum 8 oder im Praktikum 9 nach. 
+
+
+2. Nutze den Namen `ghg` und den Zuweisungsoperator "<-" um die Daten in deiner Arbeitsumgebung zu speichern
+3. Strick das Dokument und dann: git add, commit, push alle Veränderung zurück auf GitHub
+
+```{r}
+ghg <- read_csv("https://data.stadt-zuerich.ch/dataset/ugz_treibhausgasbilanz/download/ugz_treibhausgasbilanz.csv")
+```
+
+## Übung 2 - Daten transformieren und visualisieren
+
+### 2.1 Pivoting
+
+Die Daten sind derzeit in einem weiten Format. Das Ziel ist die Daten in ein langes Format zu bringen wobei nur die Spalte Jahr beibehalten wird und alle Spalten von Strom bis Heizoel_EL gedreht werden. Ich habe dir hier bereits etwas Code mit Lücken als Hilfestellung vorbereitet.
+
+1. Erstelle ein neues Objekt in deiner Arbeitsumgebung (Environment), welches im langen Format ist. Fülle dazu die Lücken aus. Den Namen für das neue Objekt kannst du selbst auswählen.
+
+```{r, eval=FALSE}
+
+___ <- ___ %>% 
+  ____longer(
+    
+    # In diesem Argument werden die Spalten ausgewählt welche gedreht werden
+    ___ = !Jahr,            
+    
+    # In diesem Argument wird der Name für die neue Spalte definiert, welche
+    # die Namen aus den zuvor ausgewählten Spalten enthält
+    ___ = "Energietraeger", 
+    
+    # In diesem Argument wird der Name für die neue Spalte definiert, welche
+    # die Werte aus den zuvor ausgewählten Spalten enhält
+    ___ = "Emissionen"
+  )
+
+```
+
+
+```{r}
+ghg_long <- ghg %>% 
+  pivot_longer(cols = !Jahr,
+               names_to = "Energietraeger",
+               values_to = "Emissionen")
+```
+
+### 2.2 Daten zusammenfassen und neue Variable erstellen
+
+1. Wieviele Spalten und Reihen hat das neue Objekt welches du im Schritt zuvor erstellt hast? **Beachte: Falls dies nicht 3 Spalten und 216 Reihen sind, gehe nochmals zur vorherigen Übung und überprüfe deinen Code**
+
+2. Starte mit dem neu erstellten Objekt im langen Format, und erstelle eine Code Sequenz, in welcher:
+
+- die Funktionen `group_by()` und `summarise()` um die Summe der Emmissionen pro Jahr zu berechnen
+- die Funktionen `mutate()` und `lag()` die Differenz zwischen den Jahren berechnen
+
+3. Speicher das Ergebnis als ein neues Objekt in deiner Arbeitsumgebung (Environment) mit einem Namen deiner Wahl
+
+```{r}
+
+ghg_long_sum <- ghg_long %>% 
+  group_by(Jahr) %>% 
+  summarise(
+    Summe = sum(Emissionen)
+  ) %>% 
+  mutate(Differenz = Summe - lag(Summe))
+
+```
+
+### 2.3 Daten visualisieren 1
+
+1. Starte mit dem Objekt, welches du in Schritt 3 der vorheringen Übung erstellt hast
+2. Erstelle ein Säulendiagram und lege das Jahr auf die x-Achse und die Differenz der Emissionen zwischen den Jahren auf die y-Achse
+3. **Bonus:** Warum ist auf der x-Achse immer nur für alle zehn Jahre ein Tick mit Beschriftung?  
+4. **Bonus:** Wandle den Typen der Variable "Jahr" in einen Faktor um bevor du den Plot erstellst
+5. **Bonus:** Passe das Layout des Plots beliebig an
+
+```{r}
+
+ghg_long_sum %>% 
+  mutate(Jahr = as_factor(Jahr)) %>% 
+  ggplot(aes(x = Jahr, y = Differenz)) +
+  geom_col()
+```
+
+
+### 2.4 Daten visualisieren 2 (Bonus)
+
+1. Nutze das Objekt welches du in "2.1 Pivoting" erstellt hast, und:
+
+- Nutze die Funktion `group_by()` um die Daten nach dem Jahr zu gruppieren
+- Nutze die Funktion `filter()` um in der Spalte Jahr nur das Jahr 1990 und das Jahr 2016 anzuzeigen
+- Wieviele Wege fallen dir ein um auf das Ergebnis zu kommen?
+
+2. Speicher das Ergebnis als ein neues Objekt in deiner Arbeitsumgebung (Environment) mit einem Namen deiner Wahl
+
+3. Nutze das neue Objekt um das Säulendiagram aus der Beschreibung der Hausaufgabe auf der Webseite für den Kurs zu reproduzieren
+
+
+```{r}
+
+ghg_long_filter <- ghg_long %>% 
+  filter(Jahr == max(Jahr) | Jahr == min(Jahr))
+
+# Zwei weitere Wege
+# ghg_long %>% 
+#   filter(Jahr %in% c(2016, 1990))  
+# 
+# ghg_long %>% 
+#   filter(Jahr == 2016 | Jahr == 1990)
+
+```
+
+```{r}
+ggplot(data = ghg_long_filter,                            
+       mapping = aes(x = Jahr,                    
+                     y = Emissionen,                  
+                     color = Energietraeger))  +   
+  
+  geom_line(size = 1) + 
+  geom_point(size = 3) + 
+  
+  # Plot Styling ab hier  
+  labs(title = "Treibhausgasemissionen in der Stadt Zürich, 1990 und 2016",
+       subtitle = "inklusive internationalem Flugverkehr, ohne Klimakorrektur",
+       y = "Treibhausgasemissionen [t CO2eq/Person]",
+       x = NULL,
+       caption = "Daten: https://data.stadt-zuerich.ch/dataset/ugz_treibhausgasbilanz",
+       fill = "Energieträger") +
+  scale_x_continuous(limits = c(1990, 2016), 
+                     breaks = c(1990, 2016)) +
+  scale_color_brewer(type = "qual") +
+  theme_minimal() +
+  theme(panel.grid.minor = element_blank())
+
+```
+
+# Übungen - Teil 3 - SQL Befehle in R
+
+In R Markdown Dokumenten kann Code aus verschiedenen Programmiersprachen ausgeführt werden. Dies wird mittels der Code-chunks gesteuert und es erlaubt Nutzer_innen die Effizienz von SQL Datenbanken mit den Stärken von R zu verbinden.
+
+## Übung 0 - Verbindung zu einer Datenbank herstellen
+
+In dieser Übung nutzen wir die Verbindung zu einer Datenbank welche ich mittels des folgenden Codes erstellt habe. In der Praxis wird hier die Verbindung zu der Datenbank erstellt, welche von der Verwaltungseinheit gepflegt wird.
+
+Der Name des Objektes mit der Verbindung zur Datenbank ist hier `con`, es kann jedoch ein beliebiger Name gewählt werden.
+
+```{r}
+library(DBI)
+
+con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+```
+
+## Übung 1 - Tabellen in einer Datenbank erkunden
+
+Ich habe auch mittels des folgenden Codes den `penguins` Datensatz aus dem `palmerpenguins` package in die Datenbank kopiert. Die Tabelle ist jetzt in unserer Datenbank hinterlegt.
+
+1. Führe den Code-chunk aus
+
+```{r}
+copy_to(con, penguins)
+```
+
+2. Führe den Befehl `dbListTables(con)` im folgenden R Code-chunk aus
+3. Führe den Befehl `dbListFields(con, "penguins)` im folgenden R Code-chunk us
+
+```{r}
+dbListTables(con)
+dbListFields(con, "penguins")
+```
+
+## Übung 2 - SQL Code-chunk einfügen
+
+1. Klicke auf das kleine grüne C+ im oberen Bereich des Fensters. Ein Dropdown Menü öffnet sich. 
+2. Klicke auf das SQL Symbol
+3. Füge das Objekt `con` hinter das "=" Zeichen im obersten Bereich des Code-chunk. Dies sollte folgendermassen aussehen: `{sql connection=con}`
+4. Schreibe nun `SELECT * FROM penguins` in den Code-chunk 
+5. Führe den Code-chunk aus
+
+```{sql connection=con}
+SELECT * FROM penguins
+```
+
+## Übung 3 - SQL Code schreiben
+
+1. Füge einen SQL Code-chunk hinzu mit einer Verbindung zum Objekt `con`
+2. Schreibe dir bekannten SQL Code um die durchschnittliche Schnabellänge (Variable: `bill_length_mm`) gruppiert nach den Variablen `island` und `species` zu berechnen
+3. Führe den Code-chunk aus
+
+```{sql connection=con}
+SELECT species, island, AVG(bill_length_mm) AS avg_bill
+FROM penguins
+GROUP BY species, island
+```
+
+## Übung 4 - SQL Abruf als Objekt speichern
+
+1. Kopiere den Code-chunk aus der vorherigen Übung
+2. Im oberen Bereich des Code-chunks, füge nach "con" ein Komma ein und dann `output.var="penguins_avg"` um den Output des Code-chunks als Objekt in einer Arbeitsumgeung (Environment) zu speichern. Dies sollte folgendermassen aussehen:
+
+`{sql connection=con, output.var="penguins_avg"}`
+
+3. Führe den Code-chunk aus und überprüfe ob das Objekt `penguins_var` in deiner Arbeitsumgebung (Environment) auftaucht
+
+```{sql connection=con, output.var="penguins_avg"}
+SELECT species, island, AVG(bill_length_mm) AS avg_bill
+FROM penguins
+GROUP BY species, island
+```
+
+
