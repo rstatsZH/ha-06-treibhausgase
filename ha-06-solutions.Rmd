@@ -66,21 +66,23 @@ Die Daten sind derzeit in einem weiten Format. Das Ziel ist die Daten in ein lan
 
 1. Erstelle ein neues Objekt in deiner Arbeitsumgebung (Environment), welches im langen Format ist. Fülle dazu die Lücken aus. Den Namen für das neue Objekt kannst du selbst auswählen.
 
+2. In den Code-chunk Optionen für den folgenden Code-chunk, ersetze FALSE durch TRUE (eval=TRUE)
+
 ```{r, eval=FALSE}
 
-___ <- ___ %>% 
-  ____longer(
+ghg_long <- ghg %>% 
+  pivot_longer(
     
     # In diesem Argument werden die Spalten ausgewählt welche gedreht werden
-    ___ = !Jahr,            
+    col = !Jahr,            
     
     # In diesem Argument wird der Name für die neue Spalte definiert, welche
     # die Namen aus den zuvor ausgewählten Spalten enthält
-    ___ = "Energietraeger", 
+    names_to = "Energietraeger", 
     
     # In diesem Argument wird der Name für die neue Spalte definiert, welche
     # die Werte aus den zuvor ausgewählten Spalten enhält
-    ___ = "Emissionen"
+    values_to = "Emissionen"
   )
 
 ```
