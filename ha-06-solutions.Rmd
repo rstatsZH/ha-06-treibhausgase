@@ -127,7 +127,7 @@ ghg_long_sum <- ghg_long %>%
 ```{r}
 
 ghg_long_sum %>% 
-  mutate(Jahr = as_factor(Jahr)) %>% 
+  mutate(Jahr = factor(Jahr)) %>% 
   ggplot(aes(x = Jahr, y = Differenz)) +
   geom_col()
 ```
@@ -143,7 +143,7 @@ ghg_long_sum %>%
 
 2. Speicher das Ergebnis als ein neues Objekt in deiner Arbeitsumgebung (Environment) mit einem Namen deiner Wahl
 
-3. Nutze das neue Objekt um das Säulendiagram aus der Beschreibung der Hausaufgabe auf der Webseite für den Kurs zu reproduzieren
+3. Nutze das neue Objekt um das Säulendiagram aus der Beschreibung der Hausaufgabe auf der Webseite für den Kurs zu reproduzieren 
 
 
 ```{r}
